@@ -1,0 +1,68 @@
+{
+    "name": "auto_capture",
+    "version": "24.11.54",
+    "main": "dist-electron/main/index.js",
+    "description": "AutoCaptuer",
+    "author": "Basheir",
+    "license": "MIT",
+    "productName": "Auto Captuer",
+    "private": true,
+    "keywords": [
+        "Auto",
+        "Captuer"
+    ],
+    "debug": {
+        "env": {
+            "VITE_DEV_SERVER_URL": "http://127.0.0.1:3344/"
+        }
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "npx auto-version  && vue-tsc --noEmit && vite build && electron-builder --publish always",
+        "buildOnly": "npx auto-version && vue-tsc --noEmit && vite build && electron-builder",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "@types/jquery": "^3.5.32",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "auto-version-js": "^0.3.10",
+        "electron": "^34.0.2",
+        "electron-builder": "26.0.1",
+        "tree-kill": "^1.2.2",
+        "typescript": "^5.7.3",
+        "vite": "^6.0.11",
+        "vite-plugin-electron": "^0.29.0",
+        "vite-plugin-electron-renderer": "^0.14.6",
+        "vite-plugin-vue-devtools": "^7.7.1",
+        "vue": "^3.5.13",
+        "vue-tsc": "^2.2.0"
+    },
+    "dependencies": {
+        "@chenfengyuan/vue-countdown": "^2.1.2",
+        "@element-plus/icons-vue": "^2.3.1",
+        "@fortawesome/fontawesome-free": "^6.7.2",
+        "@techstark/opencv-js": "^4.10.0-release.1",
+        "@vueuse/core": "^12.5.0",
+        "bootstrap": "^5.3.3",
+        "collect.js": "^4.36.1",
+        "compare-versions": "^6.1.1",
+        "compressorjs": "^1.2.1",
+        "consola": "^3.4.0",
+        "dotenv": "^16.4.7",
+        "electron-log": "^5.3.0",
+        "electron-progressbar": "^2.2.1",
+        "electron-updater": "^6.3.9",
+        "element-plus": "^2.9.3",
+        "hotkeys-js": "^3.13.9",
+        "humanize-duration": "^3.32.1",
+        "is-number": "^7.0.0",
+        "jquery": "^3.7.1",
+        "knex": "^3.1.0",
+        "knex-paginate": "^3.2.0",
+        "moment": "^2.30.1",
+        "number-to-arabic-words": "^1.5.3",
+        "numbro": "^2.5.0",
+        "sqlite3": "^5.1.7",
+        "vue-router": "^4.5.0"
+    }
+}
