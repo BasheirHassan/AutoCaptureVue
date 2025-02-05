@@ -12,7 +12,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import LangAr from "../langAr";
 import "@fortawesome/fontawesome-free/css/all.css";
 import VueCountdown from '@chenfengyuan/vue-countdown';
-
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 let app = createApp(App);
 

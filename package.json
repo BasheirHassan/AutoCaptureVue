@@ -44,6 +44,7 @@
         "@techstark/opencv-js": "^4.10.0-release.1",
         "@vueuse/core": "^12.5.0",
         "bootstrap": "^5.3.3",
+        "bootstrap-icons": "^1.11.3",
         "collect.js": "^4.36.1",
         "compare-versions": "^6.1.1",
         "compressorjs": "^1.2.1",

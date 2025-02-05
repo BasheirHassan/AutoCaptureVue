@@ -7,6 +7,7 @@
 <!--    </el-row>-->
 
 
+
     <el-row :gutter="24">
       <el-col  :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
         <div class="card h-100 w-100" style="min-height: 500px">
@@ -27,7 +28,7 @@
                 </el-space>
 
               </el-col>
-              <el-col :span="7">
+              <el-col :span="6">
                 <el-row :gutter="20" class="w-100">
                   <el-col :span="6">
                     <el-button @click="DialogSetting = true" type="primary" :disabled="isDisable" :icon="Edit" circle/>
@@ -47,10 +48,10 @@
                 </el-row>
 
               </el-col>
-              <el-col :span="6">
+              <el-col :span="4">
                 <div class="float-end">
                   <el-row :gutter="20" class="w-100">
-                    <el-col :span="6">
+                    <el-col :span="24">
                       <el-switch
                           :disabled="isDisable"
                           v-model="autoCapture"
@@ -61,6 +62,15 @@
                           active-text="تفعيل كشف ورقة"
                           inactive-text="ايقاف كشف ورقة"
                       />
+                    </el-col>
+                  </el-row>
+                </div>
+              </el-col>
+              <el-col :span="4">
+                <div class="float-end">
+                  <el-row :gutter="20" class="w-100">
+                    <el-col :span="24">
+                      <el-button @click="formConfig.enable_cropping = !formConfig.enable_cropping" :type="formConfig.enable_cropping ? 'success':'danger'"><i role="button"   class="bi bi-crop" title="تفعيل اقتصاص حسب حجم الصورة"></i></el-button>
                     </el-col>
                   </el-row>
                 </div>
