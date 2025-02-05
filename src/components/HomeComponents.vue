@@ -339,7 +339,7 @@ import {ipcEventEnum} from "@assets/ipcEvents";
 import {startVideoProcessing} from "@assets/videoProcessor";
 import {GlobalVars} from "@assets/GlobalVars";
 
-const worker = new Worker(new URL('@assets/worker.js', import.meta.url))
+const worker = new Worker('./worker.js', { type: 'module' });
 
 const DialogSetting = ref(false)
 const DialogSettingCamera = ref(false)

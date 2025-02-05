@@ -1,4 +1,3 @@
-import consola from 'consola';
 import { GlobalVars } from '@assets/GlobalVars';
 import cv from '@techstark/opencv-js';
 
