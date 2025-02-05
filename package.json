@@ -1,6 +1,6 @@
 {
     "name": "auto_capture",
-    "version": "24.11.54",
+    "version": "25.2.0",
     "main": "dist-electron/main/index.js",
     "description": "AutoCaptuer",
     "author": "Basheir",
