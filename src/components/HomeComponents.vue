@@ -31,7 +31,7 @@
               <el-col :span="6">
                 <el-row :gutter="20" class="w-100">
                   <el-col :span="6">
-                    <el-button @click="DialogSetting = true" type="primary" :disabled="isDisable" :icon="Edit" circle/>
+                    <el-button @click="DialogSetting = true" type="primary" title="اعدادات كاميرا" :disabled="isDisable" :icon="Setting" circle/>
                   </el-col>
                   <el-col :span="6">
                     <el-badge :value="formConfig.hotkey" class="item">
@@ -40,10 +40,7 @@
                                  type="primary" :icon="Camera" circle/>
                     </el-badge>
                   </el-col>
-                  <el-col :span="6">
-                    <el-button @click="DialogSettingCamera = true" type="primary" :icon="Setting" circle/>
 
-                  </el-col>
 
                 </el-row>
 
@@ -126,16 +123,15 @@
 
   <el-dialog v-model="DialogSetting" title="اعدادات" width="600" align-center draggable>
     <el-form
-        label-position="right"
+        label-position="left"
         label-width="auto"
         :model="formConfig"
-        style="max-width: 600px"
     >
       <el-form-item label="حفظ صور بقاعدة البيانات" label-position="right">
         <el-switch v-model="formConfig.save_db" @change="saveConfig" :active-value="'1'" :inactive-value="'0'"/>
       </el-form-item>
 
-      <el-form-item label="اقتصاص الصورة حسب حجم الورقة" label-position="right">
+      <el-form-item label="اقتصاص الصورة" label-position="right">
         <el-switch v-model="formConfig.enable_cropping" @change="saveConfig" :active-value="'1'" :inactive-value="'0'"/>
       </el-form-item>
 
@@ -248,66 +244,6 @@
 
       </el-form-item>
 
-
-    </el-form>
-  </el-dialog>
-  <el-dialog v-model="DialogSettingCamera" title="اعدادات كاميرا" @open="getAvailableCameras" width="600" align-center
-             draggable>
-    <el-form
-        label-position="right"
-        label-width="auto"
-        :model="formConfig"
-        style="max-width: 600px"
-    >
-
-      <el-form-item label="جودة الفيديو" label-position="right">
-        <el-select-v2
-            v-model="valueCommonResolutions"
-            :options="optionsCommonResolutions"
-            placeholder="Please select"
-            @change="saveConfig"
-            style="width: 240px"
-            value-key="width"
-        >
-          <template #default="{ item }">
-            <span style="margin-right: 8px">{{ item.label }}</span>
-            <span style="color: var(--el-text-color-secondary); font-size: 13px">
-              {{ item.value.width }} x {{ item.value.height }}
-            </span>
-          </template>
-        </el-select-v2>
-
-      </el-form-item>
-
-
-      <el-form-item label="كاميرا" label-position="right">
-        <el-select-v2
-            v-model="formConfig.camera_id"
-            :options="cameraNames"
-            placeholder="تحديد كاميرا"
-            @change="saveConfig"
-            style="width: 100%"
-            value-key="value"
-        >
-        </el-select-v2>
-      </el-form-item>
-
-
-      <el-form-item label="اتجاه كاميرا" label-position="right">
-
-        <el-select-v2
-            v-model="formConfig.facing_mode"
-            :options="cameraFacingMode"
-            placeholder="تحديد اتجاه كاميرا"
-            @change="saveConfig"
-            style="width: 100%"
-            value-key="value"
-        >
-        </el-select-v2>
-
-      </el-form-item>
-
-
     </el-form>
   </el-dialog>
 
@@ -342,7 +278,6 @@ import {GlobalVars} from "@assets/GlobalVars";
 const worker = new Worker('./worker.js', { type: 'module' });
 
 const DialogSetting = ref(false)
-const DialogSettingCamera = ref(false)
 const formConfig = reactive({
   version: null,
   hotkey: 'F3',
