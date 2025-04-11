@@ -829,11 +829,42 @@ window.addEventListener('resize', () => {
 
 async function deleteImage(path: string) {
   try {
-    await ipcRenderer.invoke('delete-image', path.fullPath);
+    // التحقق من وجود مسار الصورة
+    if (!path || !path.fullPath) {
+      console.error("مسار الصورة غير محدد");
+      return;
+    }
+
+    // التحقق من وجود الصورة في نظام الملفات قبل محاولة حذفها
+    const fileExists = await ipcRenderer.invoke('check-file-exists', path.fullPath);
+    
+    if (!fileExists) {
+      console.warn("الصورة غير موجودة في المسار المحدد:", path.fullPath);
+      // حذف من قائمة الصور في الواجهة على أي حال
+      imagesList.items = imagesList.items.filter(i => i.idDB != path.idDB);
+      // حذف من قاعدة البيانات
+      await mysqlClass.deleteImageByID(path.idDB);
+      return;
+    }
+
+    // حذف الصورة من نظام الملفات
+    const deleteResult = await ipcRenderer.invoke('delete-image', path.fullPath);
+    
+    if (!deleteResult) {
+      console.error("فشل في حذف الصورة من نظام الملفات");
+      return;
+    }
+
+    // حذف الصورة من قائمة الصور في الواجهة
     imagesList.items = imagesList.items.filter(i => i.idDB != path.idDB);
+    
+    // حذف الصورة من قاعدة البيانات
     await mysqlClass.deleteImageByID(path.idDB);
+    
+    console.log("تم حذف الصورة بنجاح:", path.fullPath);
   } catch (e) {
-    console.log(e)
+    // تسجيل الخطأ في وحدة التحكم
+    console.error("حدث خطأ أثناء حذف الصورة:", e);
   }
 }
 

@@ -300,6 +300,21 @@ ipcMain.on(ipcEventEnum["quit"], async (_, arg) => {
 });
 
 
+ipcMain.handle('check-file-exists', async (event, filePath) => {
+    try {
+        // التحقق من وجود مسار الملف
+        if (!filePath) {
+            return false;
+        }
+
+        // التحقق من وجود الملف في النظام
+        return fs.existsSync(filePath);
+    } catch (error) {
+        console.error('خطأ في التحقق من وجود الملف:', error);
+        return false;
+    }
+});
+
 
 ipcMain.handle("delete-image", async (_, arg) => {
     console.log(arg, 'delete-image')
