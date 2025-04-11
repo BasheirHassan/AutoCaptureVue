@@ -1,4 +1,4 @@
-import { GlobalVars } from '@assets/GlobalVars';
+import { GlobalVars } from '@/assets/globalVars';
 import cv from '@techstark/opencv-js';
 
 export function startVideoProcessing(

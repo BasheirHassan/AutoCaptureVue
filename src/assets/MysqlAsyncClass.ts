@@ -7,12 +7,12 @@ Mysql Connection Class
  */
 
 // @ts-ignore
-import {collect} from "collect.js";
+import { collect } from "collect.js";
 //@ts-ignore
 import config from "../../knexfile";
 
 const knex = require('knex')(config)
-const {attachPaginate} = require('knex-paginate');
+const { attachPaginate } = require('knex-paginate');
 attachPaginate();
 export default class MysqlAsyncClass {
 
@@ -38,18 +38,18 @@ export default class MysqlAsyncClass {
 
     public async getImagesTotal() {
 
-        return knex("images").count({count: "id"}).first();
+        return knex("images").count({ count: "id" }).first();
 
     }
 
     public async getImages(totalPage = 10, currentPage = 1) {
 
-        return knex({a: "images"}).select('*').orderBy(`a.id`, 'DESC')
-            .paginate({perPage: totalPage, currentPage: currentPage});
+        return knex({ a: "images" }).select('*').orderBy(`a.id`, 'DESC')
+            .paginate({ perPage: totalPage, currentPage: currentPage });
     }
 
     public async getAllImages() {
-        return knex({a: "images"}).select('*').orderBy(`a.id`, 'DESC')
+        return knex({ a: "images" }).select('*').orderBy(`a.id`, 'DESC')
 
     }
 
@@ -64,7 +64,7 @@ export default class MysqlAsyncClass {
         return knex('images').where('id', ID).update(d);
     }
 
-  public async searchImage(ocr_text: string,) {
+    public async searchImage(ocr_text: string,) {
         return knex('images').whereLike('ocr_text', '%' + ocr_text + '%');
     }
 
@@ -92,21 +92,19 @@ export default class MysqlAsyncClass {
      */
 
 
-    public async saveConfig(s: boolean) {
-        await knex.transaction(async trx => {
+    public async saveConfig(configs: Array<any>) {
+        await knex.transaction(async (trx: any) => {
             return Promise.all([
                 await knex('config').truncate().transacting(trx),
-                await knex('config').insert(s).returning('*').transacting(trx)
+                await knex('config').insert(configs).returning('*').transacting(trx)
             ]);
-        })
-
-
+        });
     }
 
 
     public async saveSettingResolution(s: any) {
         await knex('config').where('key', 'resolution').del();
-        return await knex('config').insert({key: 'resolution', value: s});
+        return await knex('config').insert({ key: 'resolution', value: s });
     }
 
 

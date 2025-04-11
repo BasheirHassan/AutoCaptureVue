@@ -1,12 +1,6 @@
 <template>
   <div class="container-fluid parent-div">
 
-    <!--    <el-row>-->
-    <!--      <el-col  :xs="24" :sm="24" :md="20" :lg="20" :xl="20"><div class="bg-black">AAAA</div> </el-col>-->
-    <!--      <el-col  :xs="24" :sm="24" :md="4"  :lg="4"  :xl="4"><div class="bg-danger">BBBB</div></el-col>-->
-    <!--    </el-row>-->
-
-
 
     <el-row :gutter="24">
       <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
@@ -87,7 +81,8 @@
         <div class="container-fluid">
           <el-alert title="عدد صور" type="info" center :close-text="xID" v-if="xID > 0" />
           <el-scrollbar class="x-scrollbar" :max-height="scrollbarHeight - 200">
-            <div class="card mt-2" v-for="img in collect(imagesList.items).reverse()">
+            <div class="card mt-2" v-for="img in (collect(imagesList.items) as Collection<ImageItem>).reverse()"
+              :key="img.id">
               <div class="card-header size-card d-flex justify-content-between">
                 <el-button @click="deleteImage(img)" icon="Delete" type="danger" circle size="small"></el-button>
                 <el-tag size="small" effect="dark" type="primary"> {{ img.id }} </el-tag>
@@ -242,7 +237,7 @@
 
 <script setup lang="ts">
 import { onBeforeMount, onMounted, onUnmounted, reactive, ref } from "vue";
-import { collect } from "collect.js";
+import { collect, Collection } from "collect.js";
 import MysqlAsyncClass from "@/assets/MysqlAsyncClass";
 import { Camera, Folder, Setting } from "@element-plus/icons-vue";
 import { ipcRenderer } from "electron";
@@ -257,16 +252,42 @@ import path from "node:path";
 import { ipcEventEnum } from "@assets/ipcEvents";
 
 import { startVideoProcessing } from "@assets/videoProcessor";
-import { GlobalVars } from "@/assets/globalVars";
+import { GlobalVars } from "@/assets/GlobalVars";
 
 const worker = new Worker('./worker.js', { type: 'module' });
 
 const DialogSetting = ref(false)
-const formConfig = reactive({
+
+interface FormConfig {
+  version: string | null;
+  hotkey: string;
+  image_type: string;
+  image_quality: number;
+  time_late_take_picture: number;
+  path_folder_to_save_image: string;
+  save_db: boolean;
+  resolution: number;
+  video_brights: number;
+  video_contrast: number;
+  auto_counter: number;
+  slider_img_show: number;
+  api_key: string;
+  camera_id: string;
+  facing_mode: string;
+  enable_cropping: boolean;
+  sharpen_level: number;
+  denoise: boolean;
+  auto_enhance: boolean;
+  brightness_adjust: number;
+  contrast_adjust: number;
+  saturation_adjust: number;
+}
+
+const formConfig = reactive<FormConfig>({
   version: null,
   hotkey: 'F3',
   image_type: "png",
-  image_quality: 95, // جودة عالية افتراضية (95%)
+  image_quality: 95,
   time_late_take_picture: 2000,
   path_folder_to_save_image: "",
   save_db: true,
@@ -279,19 +300,18 @@ const formConfig = reactive({
   camera_id: "",
   facing_mode: "environment",
   enable_cropping: false,
-  sharpen_level: 2, // مستوى حدة الصورة (0-5)
-  denoise: "1", // إزالة الضوضاء (مفعل افتراضيًا)
-  auto_enhance: "1", // تحسين تلقائي للصورة (مفعل افتراضيًا)
-  brightness_adjust: 0, // ضبط السطوع (القيمة الافتراضية 0)
-  contrast_adjust: 0, // ضبط التباين (القيمة الافتراضية 0)
-  saturation_adjust: 0 // ضبط التشبع (القيمة الافتراضية 0)
-})
-
+  sharpen_level: 2,
+  denoise: true,
+  auto_enhance: true,
+  brightness_adjust: 0,
+  contrast_adjust: 0,
+  saturation_adjust: 0
+});
 
 const isLoading = reactive({ status: false, msg: "جاري التقاط الصورة" });               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا
 const msgCapture = ref("جاري التقاط الصورة ...");               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا
 const msgLoading = ref("جاري تحميل ....");               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا // يحمل مصدر الصورة الملتقطة (الرابط)
-const imagesList = reactive({ items: [] });       // كائن تفاعلي لتخزين قائمة الصور الملتقطة
+const imagesList = reactive<{ items: ImageItem[] }>({ items: [] });       // كائن تفاعلي لتخزين قائمة الصور الملتقطة
 const captuerInitNumber = ref(0);                 // عدد المحاولات الأولية لالتقاط الورقة
 const xID = ref(0);                               // معرف تسلسلي لكل صورة ملتقطة
 const autoCapture = ref(false);                   // علم لتفعيل أو تعطيل الالتقاط التلقائي للصور
@@ -306,21 +326,35 @@ const videoIsReadyState = ref(false);             // علم للتحقق من أ
 const streamVideo = ref();                        // يخزن كائن تدفق الوسائط للفيديو
 const isDisable = ref(true);
 const isStartInit = ref(false);
-const scrollbarHeight = ref(300);
+const scrollbarHeight = ref<number>(300);
 const isStartAutoCounter = ref(false); // علم لتشغيل التقاط التلقائي للصور التقاط التلقائي للصوr
 const sampleRate = 30;
 const appVersion = ref("");
 const detectedHand = reactive({ isHand: false });
-const cameraNames = ref([]);
+
+interface ImageItem {
+  id: number;
+  idDB: any;
+  fullPath: string;
+  src: string;
+}
+
+interface CameraDevice {
+  label: string;
+  deviceId: string;
+  value: string;
+}
+
+const cameraNames = ref<CameraDevice[]>([]);
 const cameraFacingMode = ref([{ label: 'كاميرا خلفية', value: 'environment' }, { label: 'كاميرا امامية', value: 'user' }]);
 
 // Format quality tooltip to show percentage
-function formatQualityTooltip(val) {
+function formatQualityTooltip(val: any) {
   return `${val}%`;
 }
 
 // Format sharpen tooltip to show level
-function formatSharpenTooltip(val) {
+function formatSharpenTooltip(val: any) {
   const levels = ['لا تحسين', 'خفيف', 'متوسط', 'قوي', 'قوي جداً', 'أقصى'];
   return levels[val] || `مستوى ${val}`;
 }
@@ -522,8 +556,10 @@ function initTempCanvas() {
   paperBounds.tempCanvas.height = valueCommonResolutions.value.height;
 
   const tempCtx = paperBounds.tempCanvas.getContext('2d');
-  tempCtx.imageSmoothingEnabled = true;
-  tempCtx.imageSmoothingQuality = 'high';
+  if (tempCtx) {
+    tempCtx.imageSmoothingEnabled = true;
+    tempCtx.imageSmoothingQuality = 'high';
+  }
 }
 
 async function main() {
@@ -569,10 +605,10 @@ async function takePicture() {
   let cropHeight = 0;
 
   // التحقق من صحة حدود الاقتصاص
-  const isValidBounds = 
-    paperBounds.minX >= 0 && 
-    paperBounds.minY >= 0 && 
-    paperBounds.maxX > paperBounds.minX && 
+  const isValidBounds =
+    paperBounds.minX >= 0 &&
+    paperBounds.minY >= 0 &&
+    paperBounds.maxX > paperBounds.minX &&
     paperBounds.maxY > paperBounds.minY;
 
   if (stringToBoolean(formConfig.enable_cropping) && isValidBounds) {
@@ -581,7 +617,7 @@ async function takePicture() {
     cropY = paperBounds.minY;
     cropWidth = paperBounds.maxX - paperBounds.minX;
     cropHeight = paperBounds.maxY - paperBounds.minY;
-    
+
     // التأكد من أن أبعاد الاقتصاص ليست صفرية أو سالبة
     if (cropWidth <= 0 || cropHeight <= 0) {
       console.warn("Invalid crop dimensions, using full image instead");
@@ -600,12 +636,14 @@ async function takePicture() {
 
   // التحقق من تهيئة tempCanvas
   if (!paperBounds.tempCanvas) {
-    console.error("paperBounds.tempCanvas is not initialized!");
-    initTempCanvas(); // محاولة تهيئة الـ canvas إذا لم يكن موجودًا
+    initTempCanvas();
+    return;
   }
-
-  // استخدام الـ temporary canvas للحصول على بيانات الصورة عالية الجودة
   const tempCtx = paperBounds.tempCanvas.getContext('2d');
+  if (!tempCtx) {
+    console.error('Failed to get 2D context');
+    return;
+  }
 
   // تطبيق إعدادات الجودة العالية على الـ temporary canvas
   tempCtx.imageSmoothingEnabled = true;
@@ -615,6 +653,11 @@ async function takePicture() {
   tempCtx.drawImage(refVideo.value, 0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height);
 
   try {
+    if (!paperBounds.tempCanvas || !tempCtx) {
+      console.error('Canvas or context not available');
+      return;
+    }
+
     // تحويل الجودة من نسبة مئوية إلى عدد عشري (0-1)
     const qualityDecimal = formConfig.image_quality / 100;
 
@@ -629,7 +672,7 @@ async function takePicture() {
     // تعديل نسب الاقتصاص إذا كانت أبعاد الـ canvas مختلفة عن أبعاد الفيديو
     const scaleX = paperBounds.tempCanvas.width / refCanvas.value.width;
     const scaleY = paperBounds.tempCanvas.height / refCanvas.value.height;
-    
+
     const scaledCropX = cropX * scaleX;
     const scaledCropY = cropY * scaleY;
     const scaledCropWidth = cropWidth * scaleX;
@@ -752,54 +795,72 @@ function testSliderFilterVedio() {
 }
 
 function videoMaxSize() {
-  const staticSize = 300;
+  const staticSize = 300; // Size for header and other UI elements
+  const videoContainer = document.getElementById('videoContainer');
+  const videoParent = $(refVideo.value)?.[0];
+  const canvasParent = $(refCanvas.value);
 
+  // Get the available space in the card body
+  const cardBody = $(".x-card-body");
+  const cardBodyWidth = cardBody?.width() ?? 0;
+  const cardBodyHeight = cardBody?.height() ?? 0;
 
-  let videoParent = $(refVideo.value)[0];
-  let canvasParent = $(refCanvas.value);
-  let videoWidth = $(".x-card-body").width() - 20;
-  let videoHeight = $(document).height() - staticSize;
-  $(videoParent).attr('width', videoWidth + 'px');
-  $(videoParent).attr('height', videoHeight + 'px');
+  // Calculate dimensions with padding
+  const padding = 20;
+  const videoWidth = cardBodyWidth - (padding * 2);
+  const videoHeight = cardBodyHeight - (padding * 2);
 
-  $(canvasParent).attr('width', videoWidth + 'px');
-  $(canvasParent).attr('height', videoHeight + 'px');
+  // Set video container size
+  if (videoContainer) {
+    videoContainer.style.width = `${videoWidth}px`;
+    videoContainer.style.height = `${videoHeight}px`;
+    videoContainer.style.padding = `${padding}px`;
+  }
 
-  $(".x-scrollbar").attr('height', $(document).height() - staticSize + 'px');
-  scrollbarHeight.value = $(document).height();
+  // Set video element size
+  if (videoParent) {
+    $(videoParent).attr('width', videoWidth + 'px');
+    $(videoParent).attr('height', videoHeight + 'px');
+  }
 
-  let documentHeight = $(document).height();
-  $(".parent-div").attr('height', documentHeight - staticSize + 'px');
+  // Set canvas size
+  if (canvasParent) {
+    $(canvasParent).attr('width', videoWidth + 'px');
+    $(canvasParent).attr('height', videoHeight + 'px');
+  }
 
+  // Update scrollbar height
+  const docHeight = $(document)?.height() ?? 0;
+  $(".x-scrollbar")?.attr('height', docHeight - staticSize + 'px');
+  scrollbarHeight.value = docHeight;
 
+  // Update parent div height
+  const documentHeight = docHeight;
+  $(".parent-div")?.attr('height', documentHeight - staticSize + 'px');
 }
 
 /**
  * حفظ الاعدادات في قاعدة البيانات
  */
-function saveConfig() {
+async function saveConfig() {
   // تحديد مؤشر الدقة المختارة في قائمة الدقة
   formConfig.resolution = optionsCommonResolutions.value.findIndex(i => i.value.width === valueCommonResolutions.value.width);
 
   // تحويل كائن الإعدادات إلى مصفوفة من الأزواج (المفتاح والقيمة)
-  let configs = collect(formConfig).map((it, key) => {
-    // التأكد من أن القيم الرقمية تُحفظ كأرقام وليس كنصوص
-    let value = it;
-    if (key === 'brightness_adjust' || key === 'contrast_adjust' || key === 'saturation_adjust' ||
+  const configs = collect(formConfig).map((it: any, key: string) => {
+    const value = key === 'brightness_adjust' || key === 'contrast_adjust' || key === 'saturation_adjust' ||
       key === 'sharpen_level' || key === 'video_brights' || key === 'video_contrast' ||
       key === 'auto_counter' || key === 'slider_img_show' || key === 'time_late_take_picture' ||
-      key === 'image_quality') {
-      value = Number(it);
-    }
-    // التأكد من أن القيم المنطقية تُحفظ بشكل صحيح
-    else if (key === 'denoise' || key === 'auto_enhance' || key === 'enable_cropping' || key === 'save_db') {
-      value = stringToBoolean(it);
-    }
-    return { key: key, value: value }
+      key === 'image_quality'
+      ? Number(it)
+      : key === 'denoise' || key === 'auto_enhance' || key === 'enable_cropping' || key === 'save_db'
+        ? stringToBoolean(it)
+        : it;
+    return { key, value };
   }).toArray();
 
   // إعادة تهيئة الكاميرا والفيديو بالإعدادات الجديدة
-  main();
+  await main();
   videoMaxSize();
 
   // تحديث وقت التأخير في المتغير العام
@@ -810,16 +871,14 @@ function saveConfig() {
   refCanvas.value.style.filter = `brightness(${formConfig.video_brights / 50}) contrast(${formConfig.video_contrast / 50}) `;
 
   // حفظ الإعدادات في قاعدة البيانات
-  mysqlClass.saveConfig(configs).then(r => {
-    // إظهار إشعار نجاح الحفظ
-    helpersNotification(true);
-    // تطبيق تغييرات دقة الفيديو
-    changeVideoResultion();
-  }).catch(err => {
-    console.log(err)
-    // إظهار إشعار خطأ في حالة فشل الحفظ
-    helpersNotification(false, err)
-  });
+  try {
+    await mysqlClass.saveConfig(configs);
+    helpersNotification(true, 'تم حفظ الإعدادات بنجاح');
+    await changeVideoResultion();
+  } catch (err) {
+    console.log(err);
+    helpersNotification(false, err instanceof Error ? err.message : String(err));
+  }
 }
 
 window.addEventListener('resize', () => {
@@ -828,41 +887,41 @@ window.addEventListener('resize', () => {
 });
 
 
-async function deleteImage(path: string) {
+async function deleteImage(img: ImageItem) {
   try {
     // التحقق من وجود مسار الصورة
-    if (!path || !path.fullPath) {
+    if (!img || !img.fullPath) {
       console.error("مسار الصورة غير محدد");
       return;
     }
 
     // التحقق من وجود الصورة في نظام الملفات قبل محاولة حذفها
-    const fileExists = await ipcRenderer.invoke('check-file-exists', path.fullPath);
-    
+    const fileExists = await ipcRenderer.invoke('check-file-exists', img.fullPath);
+
     if (!fileExists) {
-      console.warn("الصورة غير موجودة في المسار المحدد:", path.fullPath);
+      console.warn("الصورة غير موجودة في المسار المحدد:", img.fullPath);
       // حذف من قائمة الصور في الواجهة على أي حال
-      imagesList.items = imagesList.items.filter(i => i.idDB != path.idDB);
+      imagesList.items = imagesList.items.filter(i => i.idDB !== img.idDB);
       // حذف من قاعدة البيانات
-      await mysqlClass.deleteImageByID(path.idDB);
+      await mysqlClass.deleteImageByID(img.idDB);
       return;
     }
 
     // حذف الصورة من نظام الملفات
-    const deleteResult = await ipcRenderer.invoke('delete-image', path.fullPath);
-    
+    const deleteResult = await ipcRenderer.invoke('delete-image', img.fullPath);
+
     if (!deleteResult) {
       console.error("فشل في حذف الصورة من نظام الملفات");
       return;
     }
 
     // حذف الصورة من قائمة الصور في الواجهة
-    imagesList.items = imagesList.items.filter(i => i.idDB != path.idDB);
-    
+    imagesList.items = imagesList.items.filter(i => i.idDB !== img.idDB);
+
     // حذف الصورة من قاعدة البيانات
-    await mysqlClass.deleteImageByID(path.idDB);
-    
-    console.log("تم حذف الصورة بنجاح:", path.fullPath);
+    await mysqlClass.deleteImageByID(img.idDB);
+
+    console.log("تم حذف الصورة بنجاح:", img.fullPath);
   } catch (e) {
     // تسجيل الخطأ في وحدة التحكم
     console.error("حدث خطأ أثناء حذف الصورة:", e);
@@ -981,5 +1040,63 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
   justify-content: center;
   align-items: center;
   padding: 1rem;
+}
+
+#videoContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+}
+
+#videoContainer video,
+#videoContainer canvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.x-card-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  height: calc(100vh - 300px);
+  min-height: 500px;
+  background-color: #000;
+}
+
+#videoContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  border-radius: 8px;
+}
+
+#videoContainer video,
+#videoContainer canvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .x-card-body {
+    height: calc(100vh - 400px);
+  }
+
+  #videoContainer {
+    padding: 10px;
+  }
 }
 </style>
