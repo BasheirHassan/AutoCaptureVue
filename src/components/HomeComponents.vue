@@ -1,25 +1,25 @@
 <template>
   <div class="container-fluid parent-div">
 
-<!--    <el-row>-->
-<!--      <el-col  :xs="24" :sm="24" :md="20" :lg="20" :xl="20"><div class="bg-black">AAAA</div> </el-col>-->
-<!--      <el-col  :xs="24" :sm="24" :md="4"  :lg="4"  :xl="4"><div class="bg-danger">BBBB</div></el-col>-->
-<!--    </el-row>-->
+    <!--    <el-row>-->
+    <!--      <el-col  :xs="24" :sm="24" :md="20" :lg="20" :xl="20"><div class="bg-black">AAAA</div> </el-col>-->
+    <!--      <el-col  :xs="24" :sm="24" :md="4"  :lg="4"  :xl="4"><div class="bg-danger">BBBB</div></el-col>-->
+    <!--    </el-row>-->
 
 
 
     <el-row :gutter="24">
-      <el-col  :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
+      <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
         <div class="card h-100 w-100" style="min-height: 500px">
           <div class="card-header d-flex justify-content-end align-items-center">
             <el-row :gutter="20" class="w-100">
               <el-col :span="10">
                 <el-space>
                   <el-button :disabled="isDisable" @click="startAutoCounter" icon="Clock"
-                             :type="isStartAutoCounter ? 'danger' : 'success'">
+                    :type="isStartAutoCounter ? 'danger' : 'success'">
                     <template #default>
                       <vue-countdown ref='refAutoCounter' @end="finishedAutoCounter" :auto-start="false"
-                                     :time="formConfig.auto_counter*1000" v-slot="{ totalSeconds }">ثانية /
+                        :time="formConfig.auto_counter * 1000" v-slot="{ totalSeconds }">ثانية /
                         {{ totalSeconds }}
                       </vue-countdown>
                     </template>
@@ -31,13 +31,13 @@
               <el-col :span="6">
                 <el-row :gutter="20" class="w-100">
                   <el-col :span="6">
-                    <el-button @click="DialogSetting = true" type="primary" title="اعدادات كاميرا" :disabled="isDisable" :icon="Setting" circle/>
+                    <el-button @click="DialogSetting = true" type="primary" title="اعدادات كاميرا" :disabled="isDisable"
+                      :icon="Setting" circle />
                   </el-col>
                   <el-col :span="6">
                     <el-badge :value="formConfig.hotkey" class="item">
 
-                      <el-button :disabled="isDisable" @click="takePicture"
-                                 type="primary" :icon="Camera" circle/>
+                      <el-button :disabled="isDisable" @click="takePicture" type="primary" :icon="Camera" circle />
                     </el-badge>
                   </el-col>
 
@@ -49,16 +49,9 @@
                 <div class="float-end">
                   <el-row :gutter="20" class="w-100">
                     <el-col :span="24">
-                      <el-switch
-                          :disabled="isDisable"
-                          v-model="autoCapture"
-                          class="ml-2"
-                          size="large"
-                          inline-prompt
-                          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                          active-text="تفعيل كشف ورقة"
-                          inactive-text="ايقاف كشف ورقة"
-                      />
+                      <el-switch :disabled="isDisable" v-model="autoCapture" class="ml-2" size="large" inline-prompt
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                        active-text="تفعيل كشف ورقة" inactive-text="ايقاف كشف ورقة" />
                     </el-col>
                   </el-row>
                 </div>
@@ -67,7 +60,9 @@
                 <div class="float-end">
                   <el-row :gutter="20" class="w-100">
                     <el-col :span="24">
-                      <el-button @click="formConfig.enable_cropping = !formConfig.enable_cropping" :type="formConfig.enable_cropping ? 'success':'danger'"><i role="button"   class="bi bi-crop" title="تفعيل اقتصاص حسب حجم الصورة"></i></el-button>
+                      <el-button @click="formConfig.enable_cropping = !formConfig.enable_cropping"
+                        :type="formConfig.enable_cropping ? 'success' : 'danger'"><i role="button" class="bi bi-crop"
+                          title="تفعيل اقتصاص حسب حجم الصورة"></i></el-button>
                     </el-col>
                   </el-row>
                 </div>
@@ -77,7 +72,7 @@
 
           </div>
           <div class="card-body x-card-body" v-loading="isLoading.status || GlobalVars.isLoadingCapture" ref="refCard"
-               :element-loading-text="isLoading.msg">
+            :element-loading-text="isLoading.msg">
             <div id="videoContainer" style="position: relative;">
               <video id="video" ref="refVideo" autoplay style="display: none;"></video>
               <canvas v-show="isStartInit" id="canvas" ref="refCanvas" style=" width: 100%; height: 100%"></canvas>
@@ -87,20 +82,19 @@
           </div>
 
         </div>
-      </el-col  >
-      <el-col  :xs="24" :sm="24" :md="4"  :lg="4"  :xl="4">
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
         <div class="container-fluid">
-          <el-alert title="عدد صور" type="info" center :close-text="xID" v-if="xID>0"/>
+          <el-alert title="عدد صور" type="info" center :close-text="xID" v-if="xID > 0" />
           <el-scrollbar class="x-scrollbar" :max-height="scrollbarHeight - 200">
             <div class="card mt-2" v-for="img in collect(imagesList.items).reverse()">
               <div class="card-header size-card d-flex justify-content-between">
                 <el-button @click="deleteImage(img)" icon="Delete" type="danger" circle size="small"></el-button>
                 <el-tag size="small" effect="dark" type="primary"> {{ img.id }} </el-tag>
-            </div>
+              </div>
 
-              <div  style="padding: unset!important">
-                <el-image :preview-src-list="[img.src]"
-                          style="width: 100%; height: 150px" :src="img.src" fit="fill">
+              <div style="padding: unset!important">
+                <el-image :preview-src-list="[img.src]" style="width: 100%; height: 150px" :src="img.src" fit="fill">
                 </el-image>
               </div>
             </div>
@@ -122,17 +116,14 @@
   </el-footer>
 
   <el-dialog v-model="DialogSetting" title="اعدادات" width="600" align-center draggable>
-    <el-form
-        label-position="left"
-        label-width="auto"
-        :model="formConfig"
-    >
+    <el-form label-position="left" label-width="auto" :model="formConfig">
       <el-form-item label="حفظ صور بقاعدة البيانات" label-position="right">
-        <el-switch v-model="formConfig.save_db" @change="saveConfig" :active-value="'1'" :inactive-value="'0'"/>
+        <el-switch v-model="formConfig.save_db" @change="saveConfig" :active-value="'1'" :inactive-value="'0'" />
       </el-form-item>
 
       <el-form-item label="اقتصاص الصورة" label-position="right">
-        <el-switch v-model="formConfig.enable_cropping" @change="saveConfig" :active-value="'1'" :inactive-value="'0'"/>
+        <el-switch v-model="formConfig.enable_cropping" @change="saveConfig" :active-value="'1'"
+          :inactive-value="'0'" />
       </el-form-item>
 
 
@@ -147,45 +138,34 @@
 
       <el-form-item label="سطوع " label-position="right">
         <el-slider v-model="formConfig.video_brights" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
-                   :max="100" :step="1"/>
+          :max="100" :step="1" />
       </el-form-item>
 
       <el-form-item label="Contrast" label-position="right">
         <el-slider v-model="formConfig.video_contrast" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
-                   :max="100" :step="1"/>
+          :max="100" :step="1" />
       </el-form-item>
 
       <el-form-item label="اختصار التقاط صورة" label-position="right">
-        <el-input v-model="formConfig.hotkey" @keydown="addShortCutKey($event.code,true)" @change="saveConfig"/>
+        <el-input v-model="formConfig.hotkey" @keydown="addShortCutKey($event.code, true)" @change="saveConfig" />
       </el-form-item>
 
       <el-form-item label="عداد الي التقاط صورة" label-position="right">
-        <el-input-number v-model="formConfig.auto_counter"
-                         :min="0"
-                         :max="999999"
-                         @change="saveConfig"/>
+        <el-input-number v-model="formConfig.auto_counter" :min="0" :max="999999" @change="saveConfig" />
       </el-form-item>
 
       <el-form-item label="فترة تاخير التقاط صورة / الي" label-position="right">
-        <el-input-number v-model="formConfig.time_late_take_picture"
-                         @change="saveConfig"/>
+        <el-input-number v-model="formConfig.time_late_take_picture" @change="saveConfig" />
       </el-form-item>
 
       <el-form-item label="عدد عرض صور جانبيه" label-position="right">
-        <el-input-number v-model="formConfig.slider_img_show"
-                         @change="saveConfig"/>
+        <el-input-number v-model="formConfig.slider_img_show" @change="saveConfig" />
       </el-form-item>
 
 
       <el-form-item label="جودة الفيديو" label-position="right">
-        <el-select-v2
-            v-model="valueCommonResolutions"
-            :options="optionsCommonResolutions"
-            placeholder="Please select"
-            @change="saveConfig"
-            style="width: 240px"
-            value-key="width"
-        >
+        <el-select-v2 v-model="valueCommonResolutions" :options="optionsCommonResolutions" placeholder="Please select"
+          @change="saveConfig" style="width: 240px" value-key="width">
           <template #default="{ item }">
             <span style="margin-right: 8px">{{ item.label }}</span>
             <span style="color: var(--el-text-color-secondary); font-size: 13px">
@@ -198,33 +178,50 @@
 
 
       <el-form-item label="نوع حفظ الصورة" label-position="right">
-        <el-select-v2
-            v-model="formConfig.image_type"
-            :options="optionsImageTypeSave"
-            placeholder="Please select"
-            @change="saveConfig"
-            style="width: 240px"
-            value-key="value"
-        >
+        <el-select-v2 v-model="formConfig.image_type" :options="optionsImageTypeSave" placeholder="Please select"
+          @change="saveConfig" style="width: 240px" value-key="value">
         </el-select-v2>
-
       </el-form-item>
 
+      <el-form-item label="جودة الصورة" label-position="right" v-if="formConfig.image_type !== 'png'">
+        <el-slider v-model="formConfig.image_quality" @change="saveConfig" :min="50" :max="100" :step="5"
+          :format-tooltip="formatQualityTooltip" />
+      </el-form-item>
+
+      <el-form-item label="تحسين حدة الصورة" label-position="right">
+        <el-slider v-model="formConfig.sharpen_level" @change="saveConfig" :min="0" :max="5" :step="1"
+          :format-tooltip="formatSharpenTooltip" />
+      </el-form-item>
+
+      <el-form-item label="إزالة الضوضاء" label-position="right">
+        <el-switch v-model="formConfig.denoise" @change="saveConfig" :active-value="true" :inactive-value="false" />
+      </el-form-item>
+
+      <el-form-item label="تحسين تلقائي للصورة" label-position="right">
+        <el-switch v-model="formConfig.auto_enhance" @change="saveConfig" :active-value="true"
+          :inactive-value="false" />
+      </el-form-item>
+
+      <el-form-item label="ضبط السطوع" label-position="right">
+        <el-slider v-model="formConfig.brightness_adjust" @change="saveConfig" :min="-50" :max="50" :step="5" />
+      </el-form-item>
+
+      <el-form-item label="ضبط التباين" label-position="right">
+        <el-slider v-model="formConfig.contrast_adjust" @change="saveConfig" :min="-50" :max="50" :step="5" />
+      </el-form-item>
+
+      <el-form-item label="ضبط التشبع" label-position="right">
+        <el-slider v-model="formConfig.saturation_adjust" @change="saveConfig" :min="-50" :max="50" :step="5" />
+      </el-form-item>
 
       <el-form-item label="Api Key" label-position="right">
-        <el-input v-model="formConfig.api_key" @keydown="addShortCutKey($event.code,true)" @change="saveConfig"/>
+        <el-input v-model="formConfig.api_key" @keydown="addShortCutKey($event.code, true)" @change="saveConfig" />
       </el-form-item>
 
 
       <el-form-item label="كاميرا" label-position="right">
-        <el-select-v2
-            v-model="formConfig.camera_id"
-            :options="cameraNames"
-            placeholder="Please select"
-            @change="saveConfig"
-            style="width: 100%"
-            value-key="value"
-        >
+        <el-select-v2 v-model="formConfig.camera_id" :options="cameraNames" placeholder="Please select"
+          @change="saveConfig" style="width: 100%" value-key="value">
         </el-select-v2>
 
       </el-form-item>
@@ -232,14 +229,8 @@
 
       <el-form-item label="اتجاه كاميرا" label-position="right">
 
-        <el-select-v2
-            v-model="formConfig.facing_mode"
-            :options="cameraFacingMode"
-            placeholder="تحديد اتجاه كاميرا"
-            @change="saveConfig"
-            style="width: 100%"
-            value-key="value"
-        >
+        <el-select-v2 v-model="formConfig.facing_mode" :options="cameraFacingMode" placeholder="تحديد اتجاه كاميرا"
+          @change="saveConfig" style="width: 100%" value-key="value">
         </el-select-v2>
 
       </el-form-item>
@@ -250,17 +241,17 @@
 </template>
 
 <script setup lang="ts">
-import {onBeforeMount, onMounted, onUnmounted, reactive, ref} from "vue";
-import {collect} from "collect.js";
+import { onBeforeMount, onMounted, onUnmounted, reactive, ref } from "vue";
+import { collect } from "collect.js";
 //@ts-ignore
 import MysqlAsyncClass from "@/assets/MysqlAsyncClass";
-import {Camera, Edit, Folder, Setting} from "@element-plus/icons-vue";
-import {ipcRenderer} from "electron";
+import { Camera, Edit, Folder, Setting } from "@element-plus/icons-vue";
+import { ipcRenderer } from "electron";
 //@ts-ignore
-import {helpersNotification, stringToBoolean} from "@/assets/Helpers";
+import { helpersNotification, stringToBoolean } from "@/assets/Helpers";
 //@ts-ignore
-import {imageClass} from "@/assets/ImageClass";
-import {useEventListener} from "@vueuse/core";
+import { imageClass } from "@/assets/ImageClass";
+import { useEventListener } from "@vueuse/core";
 //@ts-ignore
 import router from "@/router";
 //@ts-ignore
@@ -270,10 +261,10 @@ import handBg from '@/assets/icons/hand.png';
 import $ from "jquery";
 import path from "node:path";
 //@ts-ignore
-import {ipcEventEnum} from "@assets/ipcEvents";
+import { ipcEventEnum } from "@assets/ipcEvents";
 //@ts-ignore
-import {startVideoProcessing} from "@assets/videoProcessor";
-import {GlobalVars} from "@assets/GlobalVars";
+import { startVideoProcessing } from "@assets/videoProcessor";
+import { GlobalVars } from "@assets/GlobalVars";
 
 const worker = new Worker('./worker.js', { type: 'module' });
 
@@ -282,6 +273,7 @@ const formConfig = reactive({
   version: null,
   hotkey: 'F3',
   image_type: "png",
+  image_quality: 95, // جودة عالية افتراضية (95%)
   time_late_take_picture: 2000,
   path_folder_to_save_image: "",
   save_db: true,
@@ -293,19 +285,25 @@ const formConfig = reactive({
   api_key: "",
   camera_id: "",
   facing_mode: "environment",
-  enable_cropping: false
-
+  enable_cropping: false,
+  sharpen_level: 2, // مستوى حدة الصورة (0-5)
+  denoise: "1", // إزالة الضوضاء (مفعل افتراضيًا)
+  auto_enhance: "1", // تحسين تلقائي للصورة (مفعل افتراضيًا)
+  brightness_adjust: 0, // ضبط السطوع (القيمة الافتراضية 0)
+  contrast_adjust: 0, // ضبط التباين (القيمة الافتراضية 0)
+  saturation_adjust: 0 // ضبط التشبع (القيمة الافتراضية 0)
 })
 
-const isLoading = reactive({status: false, msg: "جاري التقاط الصورة"});               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا
+
+const isLoading = reactive({ status: false, msg: "جاري التقاط الصورة" });               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا
 const msgCapture = ref("جاري التقاط الصورة ...");               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا
 const msgLoading = ref("جاري تحميل ....");               // يشير إلى ما إذا كانت عملية التقاط الصورة جارية حاليًا // يحمل مصدر الصورة الملتقطة (الرابط)
-const imagesList = reactive({items: []});       // كائن تفاعلي لتخزين قائمة الصور الملتقطة
+const imagesList = reactive({ items: [] });       // كائن تفاعلي لتخزين قائمة الصور الملتقطة
 const captuerInitNumber = ref(0);                 // عدد المحاولات الأولية لالتقاط الورقة
 const xID = ref(0);                               // معرف تسلسلي لكل صورة ملتقطة
 const autoCapture = ref(false);                   // علم لتفعيل أو تعطيل الالتقاط التلقائي للصور
 const mysqlClass = new MysqlAsyncClass();         // كائن من فئة MysqlAsyncClass لتنفيذ العمليات غير المتزامنة مع قاعدة البيانات
-const valueCommonResolutions = ref({width: 1920, height: 1080});  // دقة الصورة الافتراضية (عرض × ارتفاع)
+const valueCommonResolutions = ref({ width: 1920, height: 1080 });  // دقة الصورة الافتراضية (عرض × ارتفاع)
 const refVideo = ref();                           // مرجع إلى عنصر الفيديو لعرض تدفق الفيديو
 const refCanvas = ref();                          // مرجع إلى عنصر الـ canvas لالتقاط الإطارات من الفيديو
 const refAutoCounter = ref();                          // مرجع إلى عنصر الـ canvas لالتقاط الإطارات من الفيديو
@@ -319,9 +317,20 @@ const scrollbarHeight = ref(300);
 const isStartAutoCounter = ref(false); // علم لتشغيل التقاط التلقائي للصور التقاط التلقائي للصوr
 const sampleRate = 30;
 const appVersion = ref("");
-const detectedHand = reactive({isHand: false});
+const detectedHand = reactive({ isHand: false });
 const cameraNames = ref([]);
-const cameraFacingMode = ref([{label: 'كاميرا خلفية', value: 'environment'}, {label: 'كاميرا امامية', value: 'user'}]);
+const cameraFacingMode = ref([{ label: 'كاميرا خلفية', value: 'environment' }, { label: 'كاميرا امامية', value: 'user' }]);
+
+// Format quality tooltip to show percentage
+function formatQualityTooltip(val) {
+  return `${val}%`;
+}
+
+// Format sharpen tooltip to show level
+function formatSharpenTooltip(val) {
+  const levels = ['لا تحسين', 'خفيف', 'متوسط', 'قوي', 'قوي جداً', 'أقصى'];
+  return levels[val] || `مستوى ${val}`;
+}
 
 
 const paperBounds = reactive({
@@ -335,9 +344,9 @@ const paperBounds = reactive({
 
 
 const optionsImageTypeSave = ref([
-  {value: 'png', label: 'png'},
-  {value: 'jpg', label: 'jpg'},
-  {value: 'jpeg', label: 'jpeg'},
+  { value: 'png', label: 'png' },
+  { value: 'jpg', label: 'jpg' },
+  { value: 'jpeg', label: 'jpeg' },
 ])  // تسلسل الصور
 
 /**
@@ -345,14 +354,14 @@ const optionsImageTypeSave = ref([
  */
 
 const optionsCommonResolutions = ref([
-  {value: {width: 2560, height: 1080}, label: '2560x1080 HD'},// 21:9
-  {value: {width: 2048, height: 1080}, label: '2048x1080 HD'},  // 21:9
-  {value: {width: 1920, height: 1080}, label: '1920x1080 HD'}, // 16:9
-  {value: {width: 3840, height: 2160}, label: '3840x2160 4K'}, // 16:9
-  {value: {width: 1280, height: 1080}, label: '1280x1080'},  // 16:9
-  {value: {width: 1024, height: 768}, label: '1024x768'},  // 4:3
-  {value: {width: 800, height: 600}, label: '800x600'},   // 4:3
-  {value: {width: 640, height: 480}, label: '640x480'},   // 4:3
+  { value: { width: 2560, height: 1080 }, label: '2560x1080 HD' },// 21:9
+  { value: { width: 2048, height: 1080 }, label: '2048x1080 HD' },  // 21:9
+  { value: { width: 1920, height: 1080 }, label: '1920x1080 HD' }, // 16:9
+  { value: { width: 3840, height: 2160 }, label: '3840x2160 4K' }, // 16:9
+  { value: { width: 1280, height: 1080 }, label: '1280x1080' },  // 16:9
+  { value: { width: 1024, height: 768 }, label: '1024x768' },  // 4:3
+  { value: { width: 800, height: 600 }, label: '800x600' },   // 4:3
+  { value: { width: 640, height: 480 }, label: '640x480' },   // 4:3
 ]);
 
 
@@ -387,6 +396,21 @@ onMounted(async () => {
 
   formConfig.video_brights = Number(formConfig.video_brights);
   formConfig.video_contrast = Number(formConfig.video_contrast);
+  formConfig.brightness_adjust = Number(formConfig.brightness_adjust || 0);
+  formConfig.contrast_adjust = Number(formConfig.contrast_adjust || 0);
+  formConfig.saturation_adjust = Number(formConfig.saturation_adjust || 0);
+  formConfig.sharpen_level = Number(formConfig.sharpen_level || 2);
+  formConfig.auto_counter = Number(formConfig.auto_counter || 10);
+  formConfig.slider_img_show = Number(formConfig.slider_img_show || 10);
+  formConfig.time_late_take_picture = Number(formConfig.time_late_take_picture || 2000);
+  formConfig.image_quality = Number(formConfig.image_quality || 95);
+
+  // تحويل القيم المنطقية
+  formConfig.denoise = stringToBoolean(formConfig.denoise);
+  formConfig.auto_enhance = stringToBoolean(formConfig.auto_enhance);
+  formConfig.enable_cropping = stringToBoolean(formConfig.enable_cropping);
+  formConfig.save_db = stringToBoolean(formConfig.save_db);
+
   GlobalVars.timeToLateCapture = formConfig.time_late_take_picture;
 
   valueCommonResolutions.value = optionsCommonResolutions.value[formConfig.resolution].value;
@@ -463,10 +487,10 @@ async function setupCamera() {
     streamVideo.value = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: formConfig.facing_mode,
-        deviceId: {exact: formConfig.camera_id},
-        width: {ideal: valueCommonResolutions.value.width},
-        height: {ideal: valueCommonResolutions.value.height},
-        aspectRatio: {ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height},
+        deviceId: { exact: formConfig.camera_id },
+        width: { ideal: valueCommonResolutions.value.width },
+        height: { ideal: valueCommonResolutions.value.height },
+        aspectRatio: { ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height },
       }
     });
 
@@ -493,20 +517,36 @@ async function setupCamera() {
 // دالة لتحويل RGB إلى HSV// دالة لتحويل RGB إلى HSV
 
 
+// Initialize the tempCanvas with high-quality settings
+function initTempCanvas() {
+  if (!paperBounds.tempCanvas) {
+    paperBounds.tempCanvas = document.createElement('canvas');
+  }
+
+  // Set canvas dimensions to match video resolution for best quality
+  paperBounds.tempCanvas.width = valueCommonResolutions.value.width;
+  paperBounds.tempCanvas.height = valueCommonResolutions.value.height;
+
+  const tempCtx = paperBounds.tempCanvas.getContext('2d');
+  tempCtx.imageSmoothingEnabled = true;
+  tempCtx.imageSmoothingQuality = 'high';
+}
+
 async function main() {
   try {
     await setupCamera();
     refVideo.value.play();
+
+    // Initialize tempCanvas with high-quality settings
+    initTempCanvas();
+
     startVideoProcessing(refVideo, refCanvas, ctx, paperBounds, detectedHand, autoCapture, isLoading, takePicture);
     await changeVideoResultion();
     isStartInit.value = true;
   } catch (e) {
     console.log(e)
     helpersNotification(false, e);
-
   }
-
-
 }
 
 
@@ -554,10 +594,29 @@ async function takePicture() {
     return;
   }
 
-  // استخدام الـ temporary canvas للحصول على بيانات الصورة
+  // استخدام الـ temporary canvas للحصول على بيانات الصورة عالية الجودة
   const tempCtx = paperBounds.tempCanvas.getContext('2d');
 
+  // تطبيق إعدادات الجودة العالية على الـ temporary canvas
+  tempCtx.imageSmoothingEnabled = true;
+  tempCtx.imageSmoothingQuality = 'high';
+
+  // رسم الإطار الحالي من الفيديو على الـ temporary canvas بجودة عالية
+  tempCtx.drawImage(refVideo.value, 0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height);
+
   try {
+    // تحويل الجودة من نسبة مئوية إلى عدد عشري (0-1)
+    const qualityDecimal = formConfig.image_quality / 100;
+
+    // التأكد من أن قيم التشبع والتباين والسطوع أرقام
+    const brightnessAdjust = Number(formConfig.brightness_adjust || 0);
+    const contrastAdjust = Number(formConfig.contrast_adjust || 0);
+    const saturationAdjust = Number(formConfig.saturation_adjust || 0);
+    const sharpenLevel = Number(formConfig.sharpen_level || 2);
+    const denoise = stringToBoolean(formConfig.denoise);
+    const autoEnhance = stringToBoolean(formConfig.auto_enhance);
+
+    // إرسال بيانات الصورة إلى العامل مع إعدادات تحسين الجودة
     worker.postMessage({
       type: 'saveImage',
       imgName: imageXID.imgName,
@@ -566,11 +625,18 @@ async function takePicture() {
       cropY: cropY,
       cropWidth: cropWidth,
       cropHeight: cropHeight,
-      width: refCanvas.value.width,
-      height: refCanvas.value.height,
-      imageData: tempCtx.getImageData(0, 0, refCanvas.value.width, refCanvas.value.height).data.buffer,
-      imageType: formConfig.image_type
-    }, [tempCtx.getImageData(0, 0, refCanvas.value.width, refCanvas.value.height).data.buffer]);
+      width: paperBounds.tempCanvas.width,
+      height: paperBounds.tempCanvas.height,
+      imageData: tempCtx.getImageData(0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height).data.buffer,
+      imageType: formConfig.image_type,
+      imageQuality: qualityDecimal, // إرسال إعداد الجودة إلى العامل
+      sharpenLevel: sharpenLevel, // إضافة مستوى تحسين الحدة
+      denoise: denoise, // تفعيل إزالة الضوضاء
+      autoEnhance: autoEnhance, // تحسين تلقائي للصورة
+      brightnessAdjust: brightnessAdjust, // ضبط السطوع
+      contrastAdjust: contrastAdjust, // ضبط التباين
+      saturationAdjust: saturationAdjust // ضبط التشبع
+    }, [tempCtx.getImageData(0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height).data.buffer]);
 
     await imageClass.playSound();
   } finally {
@@ -609,14 +675,19 @@ async function changeVideoResultion() {
   isLoading.msg = msgLoading.value;
   const videoTrack = streamVideo.value.getVideoTracks()[0];
   await videoTrack.applyConstraints({
-    width: {ideal: valueCommonResolutions.value.width},
-    height: {ideal: valueCommonResolutions.value.height},
-    aspectRatio: {ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height},
+    width: { ideal: valueCommonResolutions.value.width },
+    height: { ideal: valueCommonResolutions.value.height },
+    aspectRatio: { ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height },
     sampleRate: sampleRate// Change the width after starting the stream
-
   });
-  isLoading.status = false;
 
+  // Update tempCanvas dimensions when video resolution changes
+  if (paperBounds.tempCanvas) {
+    paperBounds.tempCanvas.width = valueCommonResolutions.value.width;
+    paperBounds.tempCanvas.height = valueCommonResolutions.value.height;
+  }
+
+  isLoading.status = false;
 }
 
 
@@ -685,26 +756,51 @@ function videoMaxSize() {
 }
 
 /**
- * حفظ الاعدادات
+ * حفظ الاعدادات في قاعدة البيانات
  */
 function saveConfig() {
+  // تحديد مؤشر الدقة المختارة في قائمة الدقة
   formConfig.resolution = optionsCommonResolutions.value.findIndex(i => i.value.width === valueCommonResolutions.value.width);
+
+  // تحويل كائن الإعدادات إلى مصفوفة من الأزواج (المفتاح والقيمة)
   let configs = collect(formConfig).map((it, key) => {
-    return {key: key, value: it}
+    // التأكد من أن القيم الرقمية تُحفظ كأرقام وليس كنصوص
+    let value = it;
+    if (key === 'brightness_adjust' || key === 'contrast_adjust' || key === 'saturation_adjust' ||
+      key === 'sharpen_level' || key === 'video_brights' || key === 'video_contrast' ||
+      key === 'auto_counter' || key === 'slider_img_show' || key === 'time_late_take_picture' ||
+      key === 'image_quality') {
+      value = Number(it);
+    }
+    // التأكد من أن القيم المنطقية تُحفظ بشكل صحيح
+    else if (key === 'denoise' || key === 'auto_enhance' || key === 'enable_cropping' || key === 'save_db') {
+      value = stringToBoolean(it);
+    }
+    return { key: key, value: value }
   }).toArray();
+
+  // إعادة تهيئة الكاميرا والفيديو بالإعدادات الجديدة
   main();
   videoMaxSize();
+
+  // تحديث وقت التأخير في المتغير العام
   GlobalVars.timeToLateCapture = formConfig.time_late_take_picture;
+
+  // تطبيق إعدادات السطوع والتباين على الفيديو والكانفاس
   refVideo.value.style.filter = `brightness(${formConfig.video_brights / 50}) contrast(${formConfig.video_contrast / 50}) `;
   refCanvas.value.style.filter = `brightness(${formConfig.video_brights / 50}) contrast(${formConfig.video_contrast / 50}) `;
+
+  // حفظ الإعدادات في قاعدة البيانات
   mysqlClass.saveConfig(configs).then(r => {
+    // إظهار إشعار نجاح الحفظ
     helpersNotification(true);
+    // تطبيق تغييرات دقة الفيديو
     changeVideoResultion();
   }).catch(err => {
     console.log(err)
+    // إظهار إشعار خطأ في حالة فشل الحفظ
     helpersNotification(false, err)
   });
-
 }
 
 window.addEventListener('resize', () => {
@@ -758,8 +854,6 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
 
 
 <style>
-
-
 .scrollbar-demo-item {
   display: flex;
   align-items: center;
@@ -794,11 +888,16 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
 
 .red-square {
   position: absolute;
-  top: 10px; /* المسافة من الأعلى */
-  left: 10px; /* المسافة من اليسار */
-  width: 100px; /* عرض المربع */
-  height: 100px; /* ارتفاع المربع */
-  z-index: 2; /* تأكد من أنه فوق الفيديو */
+  top: 10px;
+  /* المسافة من الأعلى */
+  left: 10px;
+  /* المسافة من اليسار */
+  width: 100px;
+  /* عرض المربع */
+  height: 100px;
+  /* ارتفاع المربع */
+  z-index: 2;
+  /* تأكد من أنه فوق الفيديو */
   background-image: v-bind("`url('${handBg}')`");
   background-repeat: no-repeat;
 }
@@ -825,6 +924,7 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
 .size-card {
   height: 30px !important;
 }
+
 .card-header {
   /* Optional: if additional centering for the container is needed */
   display: flex;
@@ -832,6 +932,4 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
   align-items: center;
   padding: 1rem;
 }
-
-
 </style>
