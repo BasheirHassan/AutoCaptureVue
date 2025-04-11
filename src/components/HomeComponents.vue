@@ -83,13 +83,28 @@
           <el-scrollbar class="x-scrollbar" :max-height="scrollbarHeight - 200">
             <div class="card mt-2" v-for="img in (collect(imagesList.items) as Collection<ImageItem>).reverse()"
               :key="img.id">
-              <div class="card-header size-card d-flex justify-content-between">
+              <div class="card-header size-card d-flex justify-content-between align-items-center">
                 <el-button @click="deleteImage(img)" icon="Delete" type="danger" circle size="small"></el-button>
                 <el-tag size="small" effect="dark" type="primary"> {{ img.id }} </el-tag>
               </div>
 
-              <div style="padding: unset!important">
-                <el-image :preview-src-list="[img.src]" style="width: 100%; height: 150px" :src="img.src" fit="fill">
+              <div class="image-container">
+                <el-image :preview-src-list="[img.src]" :src="img.src" fit="cover" class="preview-image"
+                  :initial-index="0" :preview-teleported="true" loading="lazy" :zoom-rate="1.2">
+                  <template #placeholder>
+                    <div class="image-placeholder d-flex justify-content-center align-items-center">
+                      <el-icon :size="32">
+                        <Loading />
+                      </el-icon>
+                    </div>
+                  </template>
+                  <template #error>
+                    <div class="image-error">
+                      <el-icon>
+                        <Picture />
+                      </el-icon>
+                    </div>
+                  </template>
                 </el-image>
               </div>
             </div>
@@ -239,7 +254,7 @@
 import { onBeforeMount, onMounted, onUnmounted, reactive, ref } from "vue";
 import { collect, Collection } from "collect.js";
 import MysqlAsyncClass from "@/assets/MysqlAsyncClass";
-import { Camera, Folder, Setting } from "@element-plus/icons-vue";
+import { Camera, Folder, Loading, Setting } from "@element-plus/icons-vue";
 import { ipcRenderer } from "electron";
 import { helpersNotification, stringToBoolean } from "@/assets/Helpers";
 import { imageClass } from "@/assets/ImageClass";
