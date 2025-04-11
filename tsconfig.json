@@ -12,13 +12,14 @@
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "noEmit": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@assets/*": ["./src/assets/*"],
-      "@components/*": ["./src/components/*"],
+      "@/*": ["src/*"],
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"]
     }
   },
-  "include": ["/src","/knexfile.ts","/src/assets/MysqlAsyncClass.ts","/src/**/*.ts","/src/**/*.vue"],
+  "include": ["src","knexfile.ts","src/assets/MysqlAsyncClass.ts","src/**/*.ts","src/**/*.vue"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

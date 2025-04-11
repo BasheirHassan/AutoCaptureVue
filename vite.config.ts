@@ -6,7 +6,7 @@ import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
 //@ts-ignore
 import VueDevTools from 'vite-plugin-vue-devtools'
-import { fileURLToPath, URL } from "url";
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -68,11 +68,11 @@ export default defineConfig(({ command }) => {
       }),
     ],
     resolve: {
-      alias: [
-        { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
-        { find: '@assets', replacement: fileURLToPath(new URL('./src/assets', import.meta.url)) },
-        { find: '@components', replacement: fileURLToPath(new URL('./src/components', import.meta.url)) },
-      ]
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+        '@assets': path.resolve(__dirname, './src/assets'),
+        '@components': path.resolve(__dirname, './src/components')
+      }
     },
     server: process.env.VSCODE_DEBUG && (() => {
       const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)

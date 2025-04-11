@@ -243,28 +243,21 @@
 <script setup lang="ts">
 import { onBeforeMount, onMounted, onUnmounted, reactive, ref } from "vue";
 import { collect } from "collect.js";
-//@ts-ignore
 import MysqlAsyncClass from "@/assets/MysqlAsyncClass";
-import { Camera, Edit, Folder, Setting } from "@element-plus/icons-vue";
+import { Camera, Folder, Setting } from "@element-plus/icons-vue";
 import { ipcRenderer } from "electron";
-//@ts-ignore
 import { helpersNotification, stringToBoolean } from "@/assets/Helpers";
-//@ts-ignore
 import { imageClass } from "@/assets/ImageClass";
 import { useEventListener } from "@vueuse/core";
-//@ts-ignore
 import router from "@/router";
-//@ts-ignore
 import MigrateClass from "@assets/MigrateClass";
-//@ts-ignore
 import handBg from '@/assets/icons/hand.png';
 import $ from "jquery";
 import path from "node:path";
-//@ts-ignore
 import { ipcEventEnum } from "@assets/ipcEvents";
-//@ts-ignore
+
 import { startVideoProcessing } from "@assets/videoProcessor";
-import { GlobalVars } from "@assets/GlobalVars";
+import { GlobalVars } from "@/assets/globalVars";
 
 const worker = new Worker('./worker.js', { type: 'module' });
 

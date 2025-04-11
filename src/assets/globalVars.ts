@@ -1,9 +1,13 @@
 import { reactive } from 'vue'
 
+/**
+ * Global reactive variables used throughout the application
+ */
 export const GlobalVars = reactive({
-  // المتغيرات العامة هنا
   isLoadingCapture: false,
   timeToLateCapture: 2000,
-  showBorders: 2000,
-  // ... المزيد من المتغيرات
+  showBorders: true,
+  // Add other global variables as needed
 })
+
+export default GlobalVars
