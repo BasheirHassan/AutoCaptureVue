@@ -265,9 +265,8 @@ import handBg from '@/assets/icons/hand.png';
 import $ from "jquery";
 import path from "node:path";
 import { ipcEventEnum } from "@assets/ipcEvents";
-
 import { startVideoProcessing } from "@assets/videoProcessor";
-import { GlobalVars } from "@/assets/GlobalVars";
+import { GlobalVars } from "@assets/GlobalVars";
 
 const worker = new Worker('./worker.js', { type: 'module' });
 
