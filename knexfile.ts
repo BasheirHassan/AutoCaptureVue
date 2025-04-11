@@ -1,25 +1,23 @@
 // Update with your config settings.
 
-import {getDBFolder, getDBName} from "./src/assets/ipcHandel";
 import path from "path";
-import {Config} from "knex";
+import type { Knex } from "knex";
+import fs from "fs";
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
 
+// Ensure the database directory exists
+const dbDir = path.join(process.env.APPDATA || '', 'AutoCapture');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
-
-const config: Config = {
+const config: Knex.Config = {
   client: 'sqlite3',
-  connection: async () => {
-    let dbPath = await getDBFolder();
-    let dbName = await getDBName();
-    console.log(dbName,'dbName')
-    console.log(dbPath,'dbPath')
-    return {
-      filename:path.join(dbPath, dbName)
-    }
+  connection: {
+    filename: path.join(dbDir, 'imageStore.db')
   },
   useNullAsDefault: true,
   migrations: {

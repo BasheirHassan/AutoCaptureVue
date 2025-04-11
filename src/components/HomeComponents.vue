@@ -502,6 +502,7 @@ async function setupCamera() {
     console.error("Error accessing camera:", error);
     helpersNotification(false, " تاكد من وجود الكاميرا او اعطاء الصلاحية Error accessing camera:" + error)
     isLoading.status = false;
+    DialogSetting.value = true
     throw error;
   }
 }
