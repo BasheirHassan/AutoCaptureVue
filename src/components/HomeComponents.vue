@@ -561,19 +561,38 @@ async function takePicture() {
   // تأخير صغير للتأكد من إخفاء الإطار
   await new Promise(resolve => setTimeout(resolve, 100));
 
-  let cropX = paperBounds.minX;
-  let cropY = paperBounds.minY;
+  // تحديد منطقة الاقتصاص
+  let cropX = 0;
+  let cropY = 0;
   let cropWidth = 0;
   let cropHeight = 0;
 
-  if (stringToBoolean(formConfig.enable_cropping)) {
+  // التحقق من صحة حدود الاقتصاص
+  const isValidBounds = 
+    paperBounds.minX >= 0 && 
+    paperBounds.minY >= 0 && 
+    paperBounds.maxX > paperBounds.minX && 
+    paperBounds.maxY > paperBounds.minY;
+
+  if (stringToBoolean(formConfig.enable_cropping) && isValidBounds) {
+    // استخدام الحدود المكتشفة للاقتصاص
+    cropX = paperBounds.minX;
+    cropY = paperBounds.minY;
     cropWidth = paperBounds.maxX - paperBounds.minX;
     cropHeight = paperBounds.maxY - paperBounds.minY;
+    
+    // التأكد من أن أبعاد الاقتصاص ليست صفرية أو سالبة
+    if (cropWidth <= 0 || cropHeight <= 0) {
+      console.warn("Invalid crop dimensions, using full image instead");
+      cropX = 0;
+      cropY = 0;
+      cropWidth = refCanvas.value.width;
+      cropHeight = refCanvas.value.height;
+    }
   } else {
+    // استخدام الصورة كاملة إذا كان الاقتصاص غير مفعل أو الحدود غير صالحة
     cropWidth = refCanvas.value.width;
     cropHeight = refCanvas.value.height;
-    cropX = 0;
-    cropY = 0;
   }
 
   let imageXID = imageClass.creatImageXID(formConfig.path_folder_to_save_image, xID.value, formConfig.image_type);
@@ -581,10 +600,7 @@ async function takePicture() {
   // التحقق من تهيئة tempCanvas
   if (!paperBounds.tempCanvas) {
     console.error("paperBounds.tempCanvas is not initialized!");
-    isLoading.status = false;
-    GlobalVars.isLoadingCapture = false;
-    GlobalVars.showBorders = true;
-    return;
+    initTempCanvas(); // محاولة تهيئة الـ canvas إذا لم يكن موجودًا
   }
 
   // استخدام الـ temporary canvas للحصول على بيانات الصورة عالية الجودة
@@ -609,26 +625,35 @@ async function takePicture() {
     const denoise = stringToBoolean(formConfig.denoise);
     const autoEnhance = stringToBoolean(formConfig.auto_enhance);
 
+    // تعديل نسب الاقتصاص إذا كانت أبعاد الـ canvas مختلفة عن أبعاد الفيديو
+    const scaleX = paperBounds.tempCanvas.width / refCanvas.value.width;
+    const scaleY = paperBounds.tempCanvas.height / refCanvas.value.height;
+    
+    const scaledCropX = cropX * scaleX;
+    const scaledCropY = cropY * scaleY;
+    const scaledCropWidth = cropWidth * scaleX;
+    const scaledCropHeight = cropHeight * scaleY;
+
     // إرسال بيانات الصورة إلى العامل مع إعدادات تحسين الجودة
     worker.postMessage({
       type: 'saveImage',
       imgName: imageXID.imgName,
       imgPath: formConfig.path_folder_to_save_image,
-      cropX: cropX,
-      cropY: cropY,
-      cropWidth: cropWidth,
-      cropHeight: cropHeight,
+      cropX: scaledCropX,
+      cropY: scaledCropY,
+      cropWidth: scaledCropWidth,
+      cropHeight: scaledCropHeight,
       width: paperBounds.tempCanvas.width,
       height: paperBounds.tempCanvas.height,
       imageData: tempCtx.getImageData(0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height).data.buffer,
       imageType: formConfig.image_type,
-      imageQuality: qualityDecimal, // إرسال إعداد الجودة إلى العامل
-      sharpenLevel: sharpenLevel, // إضافة مستوى تحسين الحدة
-      denoise: denoise, // تفعيل إزالة الضوضاء
-      autoEnhance: autoEnhance, // تحسين تلقائي للصورة
-      brightnessAdjust: brightnessAdjust, // ضبط السطوع
-      contrastAdjust: contrastAdjust, // ضبط التباين
-      saturationAdjust: saturationAdjust // ضبط التشبع
+      imageQuality: qualityDecimal,
+      sharpenLevel: sharpenLevel,
+      denoise: denoise,
+      autoEnhance: autoEnhance,
+      brightnessAdjust: brightnessAdjust,
+      contrastAdjust: contrastAdjust,
+      saturationAdjust: saturationAdjust
     }, [tempCtx.getImageData(0, 0, paperBounds.tempCanvas.width, paperBounds.tempCanvas.height).data.buffer]);
 
     await imageClass.playSound();
