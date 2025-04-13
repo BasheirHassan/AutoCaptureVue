@@ -395,16 +395,16 @@ const optionsImageTypeSave = ref([
  */
 
 const optionsCommonResolutions = ref([
-  { value: { width: 2560, height: 1080 }, label: '2560x1080 HD' },// 21:9
-  { value: { width: 2048, height: 1080 }, label: '2048x1080 HD' },  // 21:9
-  { value: { width: 1920, height: 1080 }, label: '1920x1080 HD' }, // 16:9
-  { value: { width: 3840, height: 2160 }, label: '3840x2160 4K' }, // 16:9
-  { value: { width: 1280, height: 1080 }, label: '1280x1080' },  // 16:9
-  { value: { width: 1024, height: 768 }, label: '1024x768' },  // 4:3
-  { value: { width: 800, height: 600 }, label: '800x600' },   // 4:3
-  { value: { width: 640, height: 480 }, label: '640x480' },   // 4:3
+  { value: { width: 3840, height: 2160 }, label: '3840×2160 (دقة فائقة 4K)' }, // 16:9
+  { value: { width: 2560, height: 1440 }, label: '2560×1440 (دقة عالية 2K)' }, // 16:9
+  { value: { width: 2560, height: 1080 }, label: '2560×1080 (عريض جدًا)' }, // 21:9
+  { value: { width: 2048, height: 1080 }, label: '2048×1080 (2K سينمائي)' }, // ~19:10
+  { value: { width: 1920, height: 1080 }, label: '1920×1080 (دقة كاملة FHD)' }, // 16:9
+  { value: { width: 1280, height: 720 }, label: '1280×720 (دقة عالية HD)' }, // 16:9
+  { value: { width: 1024, height: 768 }, label: '1024×768 (قياسي)' }, // 4:3
+  { value: { width: 800, height: 600 }, label: '800×600 (متوسط)' }, // 4:3
+  { value: { width: 640, height: 480 }, label: '640×480 (منخفض)' }, // 4:3
 ]);
-
 
 onBeforeMount(async () => {
   isLoading.status = true;
