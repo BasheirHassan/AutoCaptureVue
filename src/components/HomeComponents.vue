@@ -125,17 +125,18 @@
     </div>
   </el-footer>
 
+
   <el-dialog v-model="DialogSetting" title="اعدادات" width="600" align-center draggable>
     <el-form label-position="left" label-width="auto" :model="formConfig">
+
+      <!-- إعدادات الحفظ والتخزين -->
+      <el-divider content-position="center" class="settings-divider storage-divider">
+        <span class="divider-title">إعدادات الحفظ والتخزين</span>
+      </el-divider>
+
       <el-form-item label="حفظ صور بقاعدة البيانات" label-position="right">
         <el-switch v-model="formConfig.save_db" @change="saveConfig" :active-value="'1'" :inactive-value="'0'" />
       </el-form-item>
-
-      <el-form-item label="اقتصاص الصورة" label-position="right">
-        <el-switch v-model="formConfig.enable_cropping" @change="saveConfig" :active-value="'1'"
-          :inactive-value="'0'" />
-      </el-form-item>
-
 
       <el-form-item label="مجلد الحفظ" label-position="right">
         <el-input v-model="formConfig.path_folder_to_save_image" disabled>
@@ -143,19 +144,52 @@
             <el-button @click="setFolderPathToSave" :icon="Folder"></el-button>
           </template>
         </el-input>
-
       </el-form-item>
 
-      <el-form-item label="سطوع " label-position="right">
-        <el-slider v-model="formConfig.video_brights" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
-          :max="100" :step="1" />
+      <el-form-item label="نوع حفظ الصورة" label-position="right">
+        <el-select-v2 v-model="formConfig.image_type" :options="optionsImageTypeSave" placeholder="الرجاء الاختيار"
+                      @change="saveConfig" style="width: 240px" value-key="value">
+        </el-select-v2>
       </el-form-item>
 
-      <el-form-item label="Contrast" label-position="right">
-        <el-slider v-model="formConfig.video_contrast" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
-          :max="100" :step="1" />
+      <el-form-item label="جودة الصورة" label-position="right" v-if="formConfig.image_type !== 'png'">
+        <el-slider v-model="formConfig.image_quality" @change="saveConfig" :min="50" :max="100" :step="5"
+                   :format-tooltip="formatQualityTooltip" />
       </el-form-item>
 
+      <!-- إعدادات الكاميرا والفيديو -->
+      <el-divider content-position="center" class="settings-divider camera-divider">
+        <span class="divider-title">إعدادات الكاميرا والفيديو</span>
+      </el-divider>
+
+      <el-form-item label="كاميرا" label-position="right">
+        <el-select-v2 v-model="formConfig.camera_id" :options="cameraNames" placeholder="الرجاء الاختيار"
+                      @change="saveConfig" style="width: 100%" value-key="value">
+        </el-select-v2>
+      </el-form-item>
+
+      <el-form-item label="اتجاه كاميرا" label-position="right">
+        <el-select-v2 v-model="formConfig.facing_mode" :options="cameraFacingMode" placeholder="تحديد اتجاه كاميرا"
+                      @change="saveConfig" style="width: 100%" value-key="value">
+        </el-select-v2>
+      </el-form-item>
+
+      <el-form-item label="جودة الفيديو" label-position="right">
+        <el-select-v2 v-model="valueCommonResolutions" :options="optionsCommonResolutions" placeholder="الرجاء الاختيار"
+                      @change="saveConfig" style="width: 240px" value-key="width">
+          <template #default="{ item }">
+            <span style="margin-right: 8px">{{ item.label }}</span>
+            <span style="color: var(--el-text-color-secondary); font-size: 13px">
+            {{ item.value.width }} x {{ item.value.height }}
+          </span>
+          </template>
+        </el-select-v2>
+      </el-form-item>
+
+      <!-- إعدادات التقاط الصور -->
+      <el-divider content-position="center" class="settings-divider capture-divider">
+        <span class="divider-title">إعدادات التقاط الصور</span>
+      </el-divider>
       <el-form-item label="اختصار التقاط صورة" label-position="right">
         <el-input v-model="formConfig.hotkey" @keydown="addShortCutKey($event.code, true)" @change="saveConfig" />
       </el-form-item>
@@ -168,48 +202,41 @@
         <el-input-number v-model="formConfig.time_late_take_picture" @change="saveConfig" />
       </el-form-item>
 
-      <el-form-item label="عدد عرض صور جانبيه" label-position="right">
-        <el-input-number v-model="formConfig.slider_img_show" @change="saveConfig" />
+      <el-form-item label="اقتصاص الصورة" label-position="right">
+        <el-switch v-model="formConfig.enable_cropping" @change="saveConfig" :active-value="'1'"
+                   :inactive-value="'0'" />
       </el-form-item>
 
-
-      <el-form-item label="جودة الفيديو" label-position="right">
-        <el-select-v2 v-model="valueCommonResolutions" :options="optionsCommonResolutions" placeholder="Please select"
-          @change="saveConfig" style="width: 240px" value-key="width">
-          <template #default="{ item }">
-            <span style="margin-right: 8px">{{ item.label }}</span>
-            <span style="color: var(--el-text-color-secondary); font-size: 13px">
-              {{ item.value.width }} x {{ item.value.height }}
-            </span>
-          </template>
-        </el-select-v2>
-
-      </el-form-item>
-
-
-      <el-form-item label="نوع حفظ الصورة" label-position="right">
-        <el-select-v2 v-model="formConfig.image_type" :options="optionsImageTypeSave" placeholder="Please select"
-          @change="saveConfig" style="width: 240px" value-key="value">
-        </el-select-v2>
-      </el-form-item>
-
-      <el-form-item label="جودة الصورة" label-position="right" v-if="formConfig.image_type !== 'png'">
-        <el-slider v-model="formConfig.image_quality" @change="saveConfig" :min="50" :max="100" :step="5"
-          :format-tooltip="formatQualityTooltip" />
+      <!-- إعدادات تحسين الصورة -->
+      <el-divider content-position="center" class="settings-divider enhance-divider">
+        <span class="divider-title">إعدادات تحسين الصورة</span>
+      </el-divider>
+      <el-form-item label="تحسين تلقائي للصورة" label-position="right">
+        <el-switch v-model="formConfig.auto_enhance" @change="saveConfig" :active-value="true"
+                   :inactive-value="false" />
       </el-form-item>
 
       <el-form-item label="تحسين حدة الصورة" label-position="right">
         <el-slider v-model="formConfig.sharpen_level" @change="saveConfig" :min="0" :max="5" :step="1"
-          :format-tooltip="formatSharpenTooltip" />
+                   :format-tooltip="formatSharpenTooltip" />
       </el-form-item>
 
       <el-form-item label="إزالة الضوضاء" label-position="right">
         <el-switch v-model="formConfig.denoise" @change="saveConfig" :active-value="true" :inactive-value="false" />
       </el-form-item>
 
-      <el-form-item label="تحسين تلقائي للصورة" label-position="right">
-        <el-switch v-model="formConfig.auto_enhance" @change="saveConfig" :active-value="true"
-          :inactive-value="false" />
+      <!-- إعدادات ضبط الألوان والسطوع -->
+      <el-divider content-position="center" class="settings-divider color-divider">
+        <span class="divider-title">إعدادات ضبط الألوان والسطوع</span>
+      </el-divider>
+      <el-form-item label="سطوع الفيديو" label-position="right">
+        <el-slider v-model="formConfig.video_brights" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
+                   :max="100" :step="1" />
+      </el-form-item>
+
+      <el-form-item label="تباين الفيديو" label-position="right">
+        <el-slider v-model="formConfig.video_contrast" @change="saveConfig" @input="testSliderFilterVedio" :min="0"
+                   :max="100" :step="1" />
       </el-form-item>
 
       <el-form-item label="ضبط السطوع" label-position="right">
@@ -224,25 +251,16 @@
         <el-slider v-model="formConfig.saturation_adjust" @change="saveConfig" :min="-50" :max="50" :step="5" />
       </el-form-item>
 
+      <!-- إعدادات أخرى -->
+      <el-divider content-position="center" class="settings-divider other-divider">
+        <span class="divider-title">إعدادات أخرى</span>
+      </el-divider>
+      <el-form-item label="عدد عرض صور جانبيه" label-position="right">
+        <el-input-number v-model="formConfig.slider_img_show" @change="saveConfig" />
+      </el-form-item>
+
       <el-form-item label="Api Key" label-position="right">
-        <el-input v-model="formConfig.api_key" @keydown="addShortCutKey($event.code, true)" @change="saveConfig" />
-      </el-form-item>
-
-
-      <el-form-item label="كاميرا" label-position="right">
-        <el-select-v2 v-model="formConfig.camera_id" :options="cameraNames" placeholder="Please select"
-          @change="saveConfig" style="width: 100%" value-key="value">
-        </el-select-v2>
-
-      </el-form-item>
-
-
-      <el-form-item label="اتجاه كاميرا" label-position="right">
-
-        <el-select-v2 v-model="formConfig.facing_mode" :options="cameraFacingMode" placeholder="تحديد اتجاه كاميرا"
-          @change="saveConfig" style="width: 100%" value-key="value">
-        </el-select-v2>
-
+        <el-input v-model="formConfig.api_key" @change="saveConfig" />
       </el-form-item>
 
     </el-form>
@@ -1112,5 +1130,46 @@ ipcRenderer.on(ipcEventEnum["exportImages"], async (event, arg) => {
   #videoContainer {
     padding: 10px;
   }
+}
+
+.settings-divider {
+  margin: 20px 0;
+
+}
+
+.divider-title {
+  font-weight: bold;
+  font-size: 16px;
+  padding: 0 15px;
+}
+
+.storage-divider :deep(.el-divider__text) {
+  background-color: #f0f9ff;
+  color: #0077b6;
+}
+
+.camera-divider :deep(.el-divider__text) {
+  background-color: #f0fff4;
+  color: #059669;
+}
+
+.capture-divider :deep(.el-divider__text) {
+  background-color: #fef3f2;
+  color: #e11d48;
+}
+
+.enhance-divider :deep(.el-divider__text) {
+  background-color: #faf5ff;
+  color: #7e22ce;
+}
+
+.color-divider :deep(.el-divider__text) {
+  background-color: #fff7ed;
+  color: #ea580c;
+}
+
+.other-divider :deep(.el-divider__text) {
+  background-color: #f5f5f5;
+  color: #6b7280;
 }
 </style>
