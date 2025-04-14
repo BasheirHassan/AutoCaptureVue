@@ -19,7 +19,7 @@
       "@components/*": ["src/components/*"]
     }
   },
-  "include": ["src","knexfile.ts","src/assets/MysqlAsyncClass.ts","src/**/*.ts","src/**/*.vue"],
+  "include": ["src","./knexfile.ts","src/assets/MysqlAsyncClass.ts","src/**/*.ts","src/**/*.vue"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

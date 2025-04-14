@@ -758,63 +758,99 @@ async function setFolderPathToSave() {
 /**
  * تغيير حجم الفيديو
  */
+/**
+ * تغيير دقة الفيديو وتطبيق المرشحات
+ * @returns {Promise<void>}
+ */
 async function changeVideoResultion() {
-
+  // التحقق من جاهزية الفيديو
   if (!videoIsReadyState.value || !refVideo.value.videoWidth || !refVideo.value.videoHeight) {
+    console.warn('الفيديو غير جاهز بعد');
     return;
   }
-  refVideo.value.style.filter = `brightness(${formConfig.video_brights / 50}) contrast(${formConfig.video_contrast / 50}) `;
-  console.log(formConfig.video_brights / 50)
-  isLoading.status = true;
-  isLoading.msg = msgLoading.value;
-  const videoTrack = streamVideo.value.getVideoTracks()[0];
-  await videoTrack.applyConstraints({
-    width: { ideal: valueCommonResolutions.value.width },
-    height: { ideal: valueCommonResolutions.value.height },
-    aspectRatio: { ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height },
-    sampleRate: sampleRate// Change the width after starting the stream
-  });
 
-  // Update tempCanvas dimensions when video resolution changes
-  if (paperBounds.tempCanvas) {
-    paperBounds.tempCanvas.width = valueCommonResolutions.value.width;
-    paperBounds.tempCanvas.height = valueCommonResolutions.value.height;
+  try {
+    // تطبيق مرشحات السطوع والتباين
+    refVideo.value.style.filter = `brightness(${formConfig.video_brights / 50}) contrast(${formConfig.video_contrast / 50})`;
+
+    // تحديث حالة التحميل
+    isLoading.status = true;
+    isLoading.msg = msgLoading.value;
+
+    // الحصول على مسار الفيديو وتطبيق الإعدادات الجديدة
+    const videoTrack = streamVideo.value.getVideoTracks()[0];
+    if (!videoTrack) {
+      throw new Error('لا يمكن العثور على مسار الفيديو');
+    }
+
+    // تطبيق قيود الدقة الجديدة
+    await videoTrack.applyConstraints({
+      width: { ideal: valueCommonResolutions.value.width },
+      height: { ideal: valueCommonResolutions.value.height },
+      aspectRatio: { ideal: valueCommonResolutions.value.width / valueCommonResolutions.value.height },
+      sampleRate: sampleRate
+    });
+
+    // تحديث أبعاد الكانفاس المؤقت
+    if (paperBounds.tempCanvas) {
+      paperBounds.tempCanvas.width = valueCommonResolutions.value.width;
+      paperBounds.tempCanvas.height = valueCommonResolutions.value.height;
+    }
+  } catch (error) {
+    console.error('حدث خطأ أثناء تغيير دقة الفيديو:', error);
+  } finally {
+    // إعادة تعيين حالة التحميل بغض النظر عن نجاح أو فشل العملية
+    isLoading.status = false;
   }
-
-  isLoading.status = false;
 }
 
 
-function addShortCutKey(keyCode: any, isInit: boolean = false) {
-  if (!keyCode) {
-    console.error('keyCode is null or undefined');
+// متغير لتخزين مرجع مستمع الحدث حتى يمكننا إزالته لاحقًا
+let keydownListener: Function | null = null;
+
+/**
+ * تقوم بإضافة مفتاح اختصار للتقاط الصورة
+ * @param keyCode - رمز المفتاح المراد استخدامه كاختصار
+ * @param isInit - ما إذا كان هذا هو التهيئة الأولية للمفتاح
+ */
+function addShortCutKey(keyCode: string, isInit: boolean = false): void {
+  // التحقق من صحة المدخلات
+  if (!keyCode || typeof keyCode !== 'string') {
+    console.error('keyCode غير صالح أو غير محدد');
     return;
   }
+
+  // إذا كانت هذه مجرد تهيئة، قم بحفظ المفتاح والخروج
   if (isInit) {
     formConfig.hotkey = keyCode;
     saveConfig();
     return;
   }
 
-  console.log(isInit, 'isInit')
-  useEventListener(document, 'keydown', (e) => {
+  // إزالة مستمع الحدث السابق إذا كان موجودًا لتجنب التسجيل المتكرر
+  if (keydownListener) {
+    keydownListener();
+    keydownListener = null;
+  }
+
+  // تسجيل مستمع الحدث الجديد
+  keydownListener = useEventListener(document, 'keydown', (e: KeyboardEvent) => {
     if (!e) {
-      console.error('Event is null or undefined');
+      console.error('الحدث غير محدد');
       return;
     }
-    console.log(formConfig.hotkey)
-    if (e.code == formConfig.hotkey?.trim() && isDisable.value == false) {
+
+    // التحقق مما إذا كان المفتاح المضغوط يطابق المفتاح المحدد وأن التطبيق غير معطل
+    if (e.code === formConfig.hotkey?.trim() && isDisable.value === false) {
       isLoading.status = true;
       isLoading.msg = msgLoading.value;
-      if (!isInit) {
-        takePicture();
-      }
-
+      takePicture();
     }
-  })
+  });
 
+  // حفظ مفتاح الاختصار الجديد
   formConfig.hotkey = keyCode;
-
+  saveConfig();
 }
 
 
